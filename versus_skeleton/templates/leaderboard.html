@@ -1,0 +1,43 @@
+<!doctype html>
+<title>Leaderboard</title>
+
+<h1>Global Leaderboard</h1>
+
+<p>This page uses RANK, DENSE_RANK, and PERCENT_RANK.</p>
+
+<table border="1" cellpadding="5">
+  <tr>
+    <th>Rank</th>
+    <th>Dense Rank</th>
+    <th>Percent Rank</th>
+    <th>User</th>
+    <th>Points</th>
+    <th>Predictions</th>
+  </tr>
+
+  <!-- row =
+       (user_id, username, total_points, prediction_count,
+        rank_number, dense_rank_number, percent_rank_number)
+  -->
+
+  {% for row in rows %}
+    <tr
+      {% if current_user_id == row[0] %}
+        style="background-color: #ffffcc;"
+      {% endif %}
+    >
+      <td>{{ row[4] }}</td>
+      <td>{{ row[5] }}</td>
+      <td>{{ "%.2f"|format(row[6]) }}</td>
+      <td><a href="/profile/{{ row[0] }}">{{ row[1] }}</a></td>
+      <td>{{ row[2] }}</td>
+      <td>{{ row[3] }}</td>
+    </tr>
+  {% endfor %}
+</table>
+
+<hr>
+<ul>
+  <li><a href="/browse">Browse brackets</a></li>
+  <li><a href="/">Home</a></li>
+</ul>

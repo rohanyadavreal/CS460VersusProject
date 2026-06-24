@@ -1,0 +1,76 @@
+<!doctype html>
+<title>Admin SQL Console</title>
+
+<h1>Admin SQL Console</h1>
+
+<p>
+  Run one SQL statement at a time. This page is for checking
+  tables, verifying data, and showing EXPLAIN plans during grading.
+</p>
+
+<form action="/admin/sql" method="post">
+  <p>
+    <textarea
+      name="sql"
+      rows="10"
+      cols="100"
+      placeholder="Example: SHOW TABLES;"
+    >{{ sql }}</textarea>
+  </p>
+
+  <input type="submit" value="Run SQL">
+</form>
+
+{% if message %}
+  <p><b>{{ message }}</b></p>
+{% endif %}
+
+{% if error_message %}
+  <p><b>Error:</b> {{ error_message }}</p>
+{% endif %}
+
+{% if columns %}
+  <table border="1" cellpadding="5">
+    <tr>
+      {% for column in columns %}
+        <th>{{ column }}</th>
+      {% endfor %}
+    </tr>
+
+    {% for row in rows %}
+      <tr>
+        {% for value in row %}
+          <td>{{ value }}</td>
+        {% endfor %}
+      </tr>
+    {% endfor %}
+  </table>
+{% endif %}
+
+<hr>
+
+<h3>Useful test queries</h3>
+
+<pre>
+SHOW TABLES;
+
+SELECT * FROM Users;
+
+SELECT * FROM Brackets;
+
+SELECT * FROM Matchups;
+
+SELECT * FROM Predictions;
+
+SELECT * FROM Votes;
+
+EXPLAIN SELECT *
+FROM Matchups
+WHERE bracket_id = 1;
+</pre>
+
+<ul>
+  <li><a href="/">Home</a></li>
+  <li><a href="/browse">Browse brackets</a></li>
+  <li><a href="/leaderboard">Leaderboard</a></li>
+</ul>

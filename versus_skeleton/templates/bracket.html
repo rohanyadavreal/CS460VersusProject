@@ -1,0 +1,217 @@
+<!doctype html>
+<title>{{ bracket[1] }}</title>
+
+<h1>{{ bracket[1] }}</h1>
+
+<!-- bracket =
+     (bracket_id, title, description, status, entrant_count, host_id, host_username)
+-->
+
+<p>
+  Host:
+  <a href="/profile/{{ bracket[5] }}">{{ bracket[6] }}</a>
+  |
+  Entrants: {{ bracket[4] }}
+  |
+  Status: <b>{{ bracket[3] }}</b>
+</p>
+
+{% if bracket[2] %}
+  <p>{{ bracket[2] }}</p>
+{% endif %}
+
+<!-- Host controls -->
+
+{% if is_host %}
+  <hr>
+  <h3>Host Controls</h3>
+
+  {% if bracket[3] == "draft" %}
+    <form
+      action="/bracket/{{ bracket[0] }}/open_predictions"
+      method="post"
+    >
+      <input type="submit" value="Open Predictions">
+    </form>
+
+  {% elif bracket[3] == "predictions_open" %}
+    <form
+      action="/bracket/{{ bracket[0] }}/start_round_1"
+      method="post"
+    >
+      <input type="submit" value="Start Round 1">
+    </form>
+
+  {% elif active_round %}
+    <form
+      action="/bracket/{{ bracket[0] }}/close_round/{{ active_round }}"
+      method="post"
+    >
+      <input
+        type="submit"
+        value="Close Round {{ active_round }}"
+      >
+    </form>
+  {% endif %}
+{% endif %}
+
+<!-- Prediction form -->
+
+{% if current_user.is_authenticated
+      and bracket[3] == "predictions_open"
+      and not user_has_predictions %}
+
+  <hr>
+  <h3>Round 1 Predictions</h3>
+
+  <p>Choose one winner for every Round 1 matchup.</p>
+
+  <form action="/bracket/{{ bracket[0] }}/predict" method="post">
+    {% for m in matchups %}
+      {% if m[1] == 1 %}
+        <p>
+          <b>Round 1, Slot {{ m[2] }}</b><br>
+
+          <label>
+            <input
+              type="radio"
+              name="prediction_{{ m[0] }}"
+              value="{{ m[3] }}"
+              required
+            >
+            {{ m[5] }}
+          </label>
+
+          <br>
+
+          <label>
+            <input
+              type="radio"
+              name="prediction_{{ m[0] }}"
+              value="{{ m[4] }}"
+            >
+            {{ m[6] }}
+          </label>
+        </p>
+      {% endif %}
+    {% endfor %}
+
+    <input type="submit" value="Submit Predictions">
+  </form>
+
+{% elif current_user.is_authenticated
+      and bracket[3] == "predictions_open"
+      and user_has_predictions %}
+
+  <p><i>You already submitted predictions for this bracket.</i></p>
+{% endif %}
+
+<hr>
+<h3>Matchups</h3>
+
+<!-- m =
+     (matchup_id, round, slot, entrant_a_id, entrant_b_id,
+      entrant_a_name, entrant_b_name, winner_name, votes_a, votes_b)
+-->
+
+{% for m in matchups %}
+  <div style="border: 1px solid black; padding: 10px; margin-bottom: 15px;">
+    <h4>Round {{ m[1] }}, Slot {{ m[2] }}</h4>
+
+    <p>
+      <b>Entrant A:</b>
+      {{ m[5] or "TBD" }}
+      <br>
+      Votes: {{ m[8] }}
+    </p>
+
+    <p>
+      <b>Entrant B:</b>
+      {{ m[6] or "TBD" }}
+      <br>
+      Votes: {{ m[9] }}
+    </p>
+
+    <p>
+      <b>Winner:</b>
+      {{ m[7] or "Not decided yet" }}
+    </p>
+
+    <!-- Vote buttons appear only in active round -->
+
+    {% if current_user.is_authenticated
+          and active_round == m[1]
+          and m[3]
+          and m[4]
+          and m[0] not in voted_matchup_ids %}
+
+      <form action="/matchup/{{ m[0] }}/vote" method="post">
+        <input type="hidden" name="bracket_id" value="{{ bracket[0] }}">
+
+        <button
+          type="submit"
+          name="selected_entrant_id"
+          value="{{ m[3] }}"
+        >
+          Vote for {{ m[5] }}
+        </button>
+
+        <button
+          type="submit"
+          name="selected_entrant_id"
+          value="{{ m[4] }}"
+        >
+          Vote for {{ m[6] }}
+        </button>
+      </form>
+
+    {% elif current_user.is_authenticated
+          and m[0] in voted_matchup_ids %}
+
+      <p><i>You already voted in this matchup.</i></p>
+    {% endif %}
+
+    <!-- Comments -->
+
+    <h4>Comments</h4>
+
+    <ul>
+      {% for c in comments %}
+        {% if c[0] == m[0] %}
+          <li><b>{{ c[1] }}:</b> {{ c[2] }}</li>
+        {% endif %}
+      {% endfor %}
+    </ul>
+
+    {% if current_user.is_authenticated and m[1] == 1 %}
+      <form action="/matchup/{{ m[0] }}/comment" method="post">
+        <input type="hidden" name="bracket_id" value="{{ bracket[0] }}">
+
+        <input
+          type="text"
+          name="body"
+          placeholder="Write a comment"
+          required
+        >
+
+        <input type="submit" value="Comment">
+      </form>
+    {% endif %}
+  </div>
+{% endfor %}
+
+{% if bracket[3] == "completed" %}
+  <p>
+    <a href="/bracket/{{ bracket[0] }}/champion_path">
+      View Champion Path
+    </a>
+  </p>
+{% endif %}
+
+<hr>
+
+<ul>
+  <li><a href="/browse">Browse brackets</a></li>
+  <li><a href="/leaderboard">Leaderboard</a></li>
+  <li><a href="/">Home</a></li>
+</ul>

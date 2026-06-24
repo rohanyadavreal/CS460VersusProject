@@ -1,0 +1,32 @@
+<!doctype html>
+<title>Champion Path</title>
+
+<h1>Champion Path: {{ bracket[1] }}</h1>
+
+<p>This page uses a recursive CTE to trace the champion's prior wins.</p>
+
+{% if path_rows %}
+  <ol>
+    <!-- row = (round, slot, entrant_a_name, entrant_b_name, winner_name) -->
+
+    {% for row in path_rows %}
+      <li>
+        Round {{ row[0] }}:
+        {{ row[2] or "TBD" }}
+        vs
+        {{ row[3] or "TBD" }}
+        —
+        Winner: <b>{{ row[4] }}</b>
+      </li>
+    {% endfor %}
+  </ol>
+{% else %}
+  <p>No champion path found.</p>
+{% endif %}
+
+<hr>
+<ul>
+  <li><a href="/bracket/{{ bracket[0] }}">Back to bracket</a></li>
+  <li><a href="/browse">Browse brackets</a></li>
+  <li><a href="/">Home</a></li>
+</ul>

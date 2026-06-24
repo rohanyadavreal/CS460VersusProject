@@ -1,0 +1,85 @@
+<!doctype html>
+<title>{{ profile_user[1] }}'s Profile</title>
+
+<h1>{{ profile_user[1] }}'s Profile</h1>
+
+<p>
+  <b>Bio:</b>
+  {{ profile_user[2] or "No bio yet." }}
+</p>
+
+<p><b>Total points:</b> {{ stats[1] }}</p>
+<p><b>Predictions submitted:</b> {{ stats[0] }}</p>
+<p><b>Correct predictions:</b> {{ stats[2] }}</p>
+
+{% if current_user.is_authenticated
+      and current_user.id != profile_user[1] %}
+
+  {% if already_following %}
+    <form action="/profile/{{ profile_user[0] }}/unfollow" method="post">
+      <input type="submit" value="Unfollow">
+    </form>
+  {% else %}
+    <form action="/profile/{{ profile_user[0] }}/follow" method="post">
+      <input type="submit" value="Follow">
+    </form>
+  {% endif %}
+{% endif %}
+
+<h3>Achievements</h3>
+
+{% if achievements %}
+  <ul>
+    {% for a in achievements %}
+      <li><b>{{ a[0] }}</b>: {{ a[1] }}</li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No achievements yet.</p>
+{% endif %}
+
+<h3>Hosted Brackets</h3>
+
+{% if hosted_brackets %}
+  <ul>
+    {% for b in hosted_brackets %}
+      <li>
+        <a href="/bracket/{{ b[0] }}">{{ b[1] }}</a>
+        — {{ b[2] }}
+      </li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No hosted brackets yet.</p>
+{% endif %}
+
+<h3>Followers</h3>
+
+{% if followers %}
+  <ul>
+    {% for f in followers %}
+      <li><a href="/profile/{{ f[0] }}">{{ f[1] }}</a></li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>No followers yet.</p>
+{% endif %}
+
+<h3>Following</h3>
+
+{% if following %}
+  <ul>
+    {% for f in following %}
+      <li><a href="/profile/{{ f[0] }}">{{ f[1] }}</a></li>
+    {% endfor %}
+  </ul>
+{% else %}
+  <p>Not following anyone yet.</p>
+{% endif %}
+
+<hr>
+<ul>
+  <li><a href="/browse">Browse brackets</a></li>
+  <li><a href="/leaderboard">Leaderboard</a></li>
+  <li><a href="/">Home</a></li>
+</ul>
