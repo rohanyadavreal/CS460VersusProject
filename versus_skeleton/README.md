@@ -9,8 +9,8 @@ Install Python 3 and MySQL first.
 Clone the repository:
 
 ```bash
-git clone https://github.com/rohanyadavreal/CS460VersusFinalProject.git
-cd CS460VersusFinalProject
+git clone https://github.com/rohanyadavreal/CS460VersusProject.git
+cd CS460VersusProject
 ```
 
 Create and activate a virtual environment:
